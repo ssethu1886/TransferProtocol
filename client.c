@@ -1,9 +1,9 @@
 #include <arpa/inet.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <unistd.h>
-#include <time.h>
+#include <ctime>
 
 #include "utils.h"
 
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 
     // Open file for reading
     FILE *fp = fopen(filename, "rb");
-    if (fp == NULL) {
+    if (fp == nullptr) {
         perror("Error opening file");
         close(listen_sockfd);
         close(send_sockfd);

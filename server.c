@@ -1,7 +1,7 @@
 #include <arpa/inet.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <unistd.h>
 
 #include "utils.h"
@@ -50,10 +50,16 @@ int main() {
 
     // Open the target file for writing (always write to output.txt)
     FILE *fp = fopen("output.txt", "wb");
+    
+    // error checking 
+    if (!fp) {
+        perror("File open failed");
+        close(listen_sockfd);
+        close(send_sockfd);
+        return 1;
+    }
 
     // TODO: Receive file from the client and save it as output.txt
-
-    
 
     fclose(fp);
     close(listen_sockfd);
