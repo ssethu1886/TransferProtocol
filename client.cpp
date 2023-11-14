@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 
     // Open file for reading
     FILE *fp = fopen(filename, "rb");
-    if (fp == nullptr) {
+    if (fp == NULL) {
         perror("Error opening file");
         close(listen_sockfd);
         close(send_sockfd);
