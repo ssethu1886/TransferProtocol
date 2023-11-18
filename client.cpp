@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     }
 
     // TODO: Read from file, and initiate reliable data transfer to the server
-
+    //max 1200 byte pkt
  
     
     fclose(fp);
