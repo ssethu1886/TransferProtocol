@@ -60,6 +60,7 @@ int main() {
     }
 
     // TODO: Receive file from the client and save it as output.txt
+    int seq_num = 0;// to be sent as ACK
 
     fclose(fp);
     close(listen_sockfd);

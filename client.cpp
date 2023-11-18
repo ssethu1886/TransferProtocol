@@ -71,12 +71,23 @@ int main(int argc, char *argv[]) {
     }
 
     // TODO: Read from file, and initiate reliable data transfer to the server
-    //max 1200 byte pkt
+        /* if we start seq num at zero, then we just send
+        file contents from seqnum*1024 to (seqnum+1)*1024 -1   
+        ex pkt 0 ->   0 - 1023   */
  
+    int seq_num = 0;
+
+
+
+
+
+
     
     fclose(fp);
     close(listen_sockfd);
     close(send_sockfd);
     return 0;
 }
+
+    
 
