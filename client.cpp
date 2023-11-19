@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    // Connect to send_fd proxy server
+    // Connect to send_fd proxy server - where we send packets to be forwarded to server
     if( connect(send_sockfd, (struct sockaddr *)&server_addr_to, sizeof(server_addr_to)) < 0 ){
         perror("Connection failed");
         close(send_sockfd);
@@ -92,7 +92,8 @@ int main(int argc, char *argv[]) {
         printf("Bytes sent: %zd\n", bytes_sent);// db
 
         //packet recieved_pkt
-        //int val_read = read(listen_fd, recieved_pkt, sizeof(recieved_pkt));
+        usleep(TIMEOUT * 100000);// wait for 0.2 seconds (prop/RTT) = 200 000 microseconds
+        //int val_read = read(listen_fd, recieved_pkt, sizeof(recieved_pkt));// ???
         //printRecv(recieved_pkt);
         
         //seq_num++;

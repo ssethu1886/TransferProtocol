@@ -18,6 +18,7 @@
 #define WINDOW_SIZE 5 
 #define TIMEOUT 2 
 
+#define PKT_SIZE 1036
 
 // Packet Layout
 // You may change this if you want to
@@ -68,8 +69,8 @@ void getFileInfo( struct file_info* file_info, FILE * fp) {
     fileSize = ftell(fp);
     rewind(fp);// Go back to beginning
     
-    int remainingBytes = fileSize % 1024;
-    int totalSections = (fileSize / 1024) + (remainingBytes > 0 ? 1 : 0);
+    int remainingBytes = fileSize % PAYLOAD_SIZE;
+    int totalSections = (fileSize / PAYLOAD_SIZE) + (remainingBytes > 0 ? 1 : 0);
 
     file_info->size = fileSize;
     file_info->sections = totalSections;
