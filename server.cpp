@@ -48,6 +48,13 @@ int main() {
     client_addr_to.sin_addr.s_addr = inet_addr(LOCAL_HOST);
     client_addr_to.sin_port = htons(CLIENT_PORT_TO);
 
+    // Connect to send_fd proxy server - where we send acks to be forwarded to client
+    if( connect(send_sockfd, (struct sockaddr *)&client_addr_to, sizeof(client_addr_to)) < 0 ){
+        perror("Connection failed");
+        close(send_sockfd);
+        return 1;
+    }
+    
     // Open the target file for writing (always write to output.txt)
     FILE *fp = fopen("output.txt", "wb");
     
@@ -60,7 +67,21 @@ int main() {
     }
 
     // TODO: Receive file from the client and save it as output.txt
+    while(true){ // recieve until we find a pkt with last = true
+        //usleep(TIMEOUT);
+        int val_read = 0;
+        char * rec_pkt_buff = new char[PKT_SIZE];
+        while(( val_read = recv(listen_sockfd, rec_pkt_buff, sizeof(rec_pkt_buff),0) ) < PKT_SIZE ){
+            usleep(TIMEOUT * 100000);        
+        }
+    printf("read: %d bytes\n",val_read);
+        //packet recieved_pkt;
+        //memcpy(&recieved_pkt, rec_pkt_buff, sizeof(packet));
 
+        // save payload to file
+        // send(); // send ack to send_sockfd - 5001
+        delete[] rec_pkt_buff;
+    }
     fclose(fp);
     close(listen_sockfd);
     close(send_sockfd);

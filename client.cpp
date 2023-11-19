@@ -61,22 +61,51 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    // Connect to send_fd proxy server - where we send packets to be forwarded to server
+    if( connect(send_sockfd, (struct sockaddr *)&server_addr_to, sizeof(server_addr_to)) < 0 ){
+        perror("Connection failed");
+        close(send_sockfd);
+        return 1;
+    }
+
     // Open file for reading
     FILE *fp = fopen(filename, "rb");
+    file_info file_info;
     if (fp == NULL) {
         perror("Error opening file");
         close(listen_sockfd);
         close(send_sockfd);
         return 1;
+    } else {
+        getFileInfo(&file_info,fp);
+        printFileInfo(&file_info);
     }
 
-    // TODO: Read from file, and initiate reliable data transfer to the server
+    // stop and wait
+    for( int i = 0; i < 1/*file_info.sections*/; i++){
+        // Read file section and send it in a packet
+        readFileSection(buffer,fp,seq_num,PAYLOAD_SIZE);
+        packet test_pkt;
+        build_packet(&test_pkt, seq_num,ack_num,0,0,MAX_SEQUENCE,buffer);
+        ssize_t bytes_sent = send(send_sockfd,(void *)&test_pkt,sizeof(test_pkt),0);
+        printSend(&test_pkt,0);// db
+        printf("Bytes sent: %zd\n", bytes_sent);// db
 
- 
-    
+        //packet recieved_pkt
+        usleep(TIMEOUT * 100000);// wait for 0.2 seconds (prop/RTT) = 200 000 microseconds
+        //int val_read = read(listen_fd, recieved_pkt, sizeof(recieved_pkt));// ???
+        //printRecv(recieved_pkt);
+        
+        //seq_num++;
+        //ack_num += rec_pkt ack (cumulative?)
+    }
+    // send last should be sent specially (?)
+
     fclose(fp);
     close(listen_sockfd);
     close(send_sockfd);
     return 0;
 }
+
+    
 
