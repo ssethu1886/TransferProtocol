@@ -68,19 +68,17 @@ int main() {
 
     // TODO: Receive file from the client and save it as output.txt
     while(true){ // recieve until we find a pkt with last = true
-        //usleep(TIMEOUT);
         int val_read = 0;
-        char * rec_pkt_buff = new char[PKT_SIZE];
-        while(( val_read = recv(listen_sockfd, rec_pkt_buff, sizeof(rec_pkt_buff),0) ) < PKT_SIZE ){
-            usleep(TIMEOUT * 100000);        
-        }
-    printf("read: %d bytes\n",val_read);
-        //packet recieved_pkt;
-        //memcpy(&recieved_pkt, rec_pkt_buff, sizeof(packet));
+        char pkt_buff[PKT_SIZE];
+        packet rec_pkt;
 
+        val_read = recv(listen_sockfd, pkt_buff, PKT_SIZE,0);
+        printf("read: %d bytes\n",val_read);
+        printBuffer(pkt_buff,PKT_SIZE);//note: this is also printing the packet (~12 bytes)      
+        memcpy(&rec_pkt, pkt_buff, sizeof(packet));
+        printRecv(&rec_pkt);
         // save payload to file
         // send(); // send ack to send_sockfd - 5001
-        delete[] rec_pkt_buff;
     }
     fclose(fp);
     close(listen_sockfd);
