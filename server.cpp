@@ -74,11 +74,12 @@ int main() {
 
         val_read = recv(listen_sockfd, pkt_buff, PKT_SIZE,0);
         printf("read: %d bytes\n",val_read);
-        printBuffer(pkt_buff,PKT_SIZE);//note: this is also printing the packet (~12 bytes)      
+        //printBuffer(pkt_buff,PKT_SIZE);//note: this is also printing the packet (~12 bytes)      
         memcpy(&rec_pkt, pkt_buff, sizeof(packet));
         printRecv(&rec_pkt);
-        // save payload to file
-        // send(); // send ack to send_sockfd - 5001
+        
+        // TODO save payload to outpu file
+        // send(); // TODO send ack to send_sockfd - 5001
     }
     fclose(fp);
     close(listen_sockfd);

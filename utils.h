@@ -70,16 +70,16 @@ void getFileInfo( struct file_info* file_info, FILE * fp) {
     rewind(fp);// Go back to beginning
     
     int remainingBytes = fileSize % PAYLOAD_SIZE;
-    int totalSections = (fileSize / PAYLOAD_SIZE) + (remainingBytes > 0 ? 1 : 0);
+    int totalSections = (fileSize / PAYLOAD_SIZE);// + (remainingBytes > 0 ? 1 : 0);
 
     file_info->size = fileSize;
-    file_info->sections = totalSections;
+    file_info->sections = totalSections;// FULL sections
     file_info->trail = remainingBytes;
 }
 
 void printBuffer(char* buffer, int size) {
     /* Function for testing */
-    for (int i = 0; i < size-2; ++i) {
+    for (int i = 0; i < size-1; ++i) {
         printf("%c", buffer[i]);
     }
     printf("\n");
