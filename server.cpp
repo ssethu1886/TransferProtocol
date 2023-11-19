@@ -60,8 +60,11 @@ int main() {
     }
 
     // TODO: Receive file from the client and save it as output.txt
-    int ack_num = 0;// to be sent as ACK
-
+    while(true){ // recieve until we find a pkt with last = true
+        // read(); // read from listen_sockfd - 5002
+        // save payload to file
+        // send(); // send ack to send_sockfd - 5001
+    }
     fclose(fp);
     close(listen_sockfd);
     close(send_sockfd);
