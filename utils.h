@@ -70,7 +70,7 @@ void getFileInfo( struct file_info* file_info, FILE * fp) {
     rewind(fp);// Go back to beginning
     
     int remainingBytes = fileSize % PAYLOAD_SIZE;
-    int totalSections = (fileSize / PAYLOAD_SIZE);// + (remainingBytes > 0 ? 1 : 0);
+    int totalSections = (fileSize / PAYLOAD_SIZE);
 
     file_info->size = fileSize;
     file_info->sections = totalSections;// FULL sections
@@ -90,7 +90,7 @@ void printFileInfo(file_info * fi){
 }
 
 void readFileSection(char* buffer, FILE * fp, int seq_num, int bytes){
-    // TODO: function that retrieves seq_num'th section of 1024 bytes of the file pointed to by fp and store it in buffer
+    // Retrieves seq_num'th section of 1024 bytes of the file pointed to by fp and store it in buffer
     int offset = seq_num * PAYLOAD_SIZE;
     if (fseek(fp, offset, SEEK_SET) != 0) {
         fprintf(stderr, "Error seeking to the desired section\n");

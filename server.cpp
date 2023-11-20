@@ -67,18 +67,26 @@ int main() {
     }
 
     // TODO: Receive file from the client and save it as output.txt
+    int total_byte = 0;
     while(true){ // recieve until we find a pkt with last = true
         int val_read = 0;
         char pkt_buff[PKT_SIZE];
         packet rec_pkt;
 
         val_read = recv(listen_sockfd, pkt_buff, PKT_SIZE,0);
-        printf("read: %d bytes\n",val_read);
-        //printBuffer(pkt_buff,PKT_SIZE);//note: this is also printing the packet (~12 bytes)      
         memcpy(&rec_pkt, pkt_buff, sizeof(packet));
         printRecv(&rec_pkt);
-        
-        // TODO save payload to outpu file
+        // TODO, handle dup packets - track seq nums already recieved ?
+
+        int byte_write = fwrite(rec_pkt.payload, 1, rec_pkt.length, fp);
+        total_byte += byte_write;
+        printf("\tfs: %d\n",total_byte);
+
+        if(rec_pkt.last){
+            break;//break when we recieve last packet (only for stop and go)
+            // later, might be when we send ack for last pkt
+        }
+
         // send(); // TODO send ack to send_sockfd - 5001
     }
     fclose(fp);
