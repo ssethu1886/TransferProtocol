@@ -93,13 +93,14 @@ int main(int argc, char *argv[]) {
         sendto(send_sockfd,pkt_buffer,PKT_SIZE,0,(const sockaddr*)&server_addr_to,sizeof(server_addr_to));
 
         // Wait for ACK
-        packet recieved_pkt
+        char ack_pkt_buff[PKT_SIZE];
         usleep(TIMEOUT * 100000);// wait for 0.2 seconds (RTT?) 
-        while( read(listen_fd, pkt_buffer, PKT_SIZE) < 0 )// Attempt to read an ACK 
+        while( read(listen_sockfd, ack_pkt_buff, PKT_SIZE) < 0 )// Attempt to read an ACK 
         {
             sendto(send_sockfd,pkt_buffer,PKT_SIZE,0,(const sockaddr*)&server_addr_to,sizeof(server_addr_to));
         }
-        printRecv(recieved_pkt);
+        memcpy(ack_pkt_buff,&ack_pkt,sizeof(pkt));
+        printRecv(&ack_pkt);
         
         //seq_num++;
         usleep(TIMEOUT * 1000);
