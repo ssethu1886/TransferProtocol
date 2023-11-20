@@ -82,21 +82,27 @@ int main(int argc, char *argv[]) {
     }
 
     // stop and wait
-    for( int i = 0; i < 1/*file_info.sections*/; i++){
+    for( int i = 0; i < file_info.sections; i++){
         // Read file section and send it in a packet
-        readFileSection(buffer,fp,seq_num,PAYLOAD_SIZE);
-        packet test_pkt;
-        build_packet(&test_pkt, seq_num,ack_num,0,0,MAX_SEQUENCE,buffer);
-        ssize_t bytes_sent = send(send_sockfd,(void *)&test_pkt,sizeof(test_pkt),0);
-        printSend(&test_pkt,0);// db
-        printf("Bytes sent: %zd\n", bytes_sent);// db
+        readFileSection(buffer,fp,seq_num,PAYLOAD_SIZE);// read 1024, put in buffer
+        build_packet(&pkt, seq_num,ack_num,0,0,MAX_SEQUENCE,buffer);//build pkt (use buffer)
+
+        char pkt_buffer[PKT_SIZE];// buffer to hold pkt
+        memcpy(pkt_buffer,&pkt,sizeof(pkt));// copy pkt into buffer
+        //printBuffer(pkt_buffer,PKT_SIZE);// test
+
+        ssize_t bytes_sent = sendto(send_sockfd,pkt_buffer,PKT_SIZE,0,
+            (const sockaddr*)&server_addr_to,sizeof(server_addr_to));
+        //printf("Bytes sent: %zd\n", bytes_sent);// db
+        printSend(&pkt,0);
 
         //packet recieved_pkt
-        usleep(TIMEOUT * 100000);// wait for 0.2 seconds (prop/RTT) = 200 000 microseconds
+        //usleep(TIMEOUT * 100000);// wait for 0.2 seconds (prop/RTT) = 200 000 microseconds
         //int val_read = read(listen_fd, recieved_pkt, sizeof(recieved_pkt));// ???
         //printRecv(recieved_pkt);
         
-        //seq_num++;
+        seq_num++;
+        usleep(1000);
         //ack_num += rec_pkt ack (cumulative?)
     }
     // send last should be sent specially (?)
