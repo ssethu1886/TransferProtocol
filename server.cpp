@@ -24,8 +24,10 @@ int main() {
 
     // Create a UDP socket for listening
     listen_sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    //fcntl(listen_sockfd, F_SETFL, O_NONBLOCK);// shouldnt have to move on after hang ?
+    // rcv -> send -> rcv .... -> send , if nothing to read, dont send anythin ?
     if (listen_sockfd < 0) {
-        perror("Could not create listen socket");
+        perror("s: Could not create listen socket");
         return 1;
     }
 
@@ -76,8 +78,9 @@ int main() {
 
         // Recieve pkt from proxy 
         if ( recv(listen_sockfd, pkt_buff, PKT_SIZE,0) < PKT_SIZE ){
+            printf("no pkt\n");
             continue;
-        }
+        } 
         memcpy(&rec_pkt, pkt_buff, sizeof(packet));//store in rec_pkt
         printRecv(&rec_pkt);
         // TODO, handle dup packets - track seq nums already recieved ?

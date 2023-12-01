@@ -16,9 +16,10 @@
 
 // able to change these
 #define WINDOW_SIZE 5 
-#define TIMEOUT 2 
+#define TIMEOUT 2 // 1 for perf
 
 #define PKT_SIZE 1036
+#include <fcntl.h>
 
 // Packet Layout
 // You may change this if you want to

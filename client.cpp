@@ -29,9 +29,10 @@ int main(int argc, char *argv[]) {
     char *filename = argv[1];
 
     // Create a UDP socket for listening
-    listen_sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    listen_sockfd = socket(AF_INET, SOCK_DGRAM, 0 ); 
+    fcntl(listen_sockfd, F_SETFL, O_NONBLOCK); // NON blocking listening (recv), no hanging on read
     if (listen_sockfd < 0) {
-        perror("Could not create listen socket");
+        perror("c: Could not create listen socket");
         return 1;
     }
 
@@ -97,18 +98,22 @@ int main(int argc, char *argv[]) {
         printSend(&pkt,0);
 
         // Wait for ACK
-        //while(true){// this is where we "stop and wait"
+        while(true){// this is where we "stop and wait" (while loop just lets us save reading time - might be too complicated later) 
             // wait rtt
-            //usleep( TIMEOUT * 100000 );// wait for 0.2 seconds (RTT?)            
+            usleep( TIMEOUT * 100000 );// wait for 0.2 seconds (RTT?)            
             
             // read and store pkt
             if ( recv(listen_sockfd, ack_pkt_buffer, PKT_SIZE,0) < PKT_SIZE ){
+                sendto(send_sockfd,pkt_buffer,PKT_SIZE,0,(const sockaddr*)&server_addr_to,sizeof(server_addr_to));
+                printSend(&pkt,1);
+                printf("waiting for ack\n");
                 continue;
             }
+            
             memcpy(&ack_pkt, ack_pkt_buffer,  sizeof(ack_pkt) );// store ack pkt buffer into pkt 
             printRecv(&ack_pkt);
 
-            /*
+            
             // check ack num
             if( ack_pkt.acknum == seq_num + 1 ){// cumulative ? next to be recieved ? last successfully recieved ? .TBD
                 break; // good, exit wait loop
@@ -117,7 +122,7 @@ int main(int argc, char *argv[]) {
                 sendto(send_sockfd,pkt_buffer,PKT_SIZE,0,(const sockaddr*)&server_addr_to,sizeof(server_addr_to));
                 printSend(&pkt,1);
             }
-        }*/
+        }
         //printRecv(&ack_pkt);
         
     }
