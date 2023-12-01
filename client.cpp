@@ -81,8 +81,11 @@ int main(int argc, char *argv[]) {
         printFileInfo(&file_info);
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     // stop and wait (still need timeouts)
     char pkt_buffer[PKT_SIZE];// buffer to hold pkt
+    char ack_pkt_buffer[PKT_SIZE];// buffer to hold ack pkt
     for( seq_num = 0; seq_num < file_info.sections; seq_num++){
         
         // Read file section and store in a packet's payload
@@ -91,30 +94,39 @@ int main(int argc, char *argv[]) {
         memcpy(pkt_buffer,&pkt,sizeof(pkt));// copy pkt into buffer (for sending)
         // Send 
         sendto(send_sockfd,pkt_buffer,PKT_SIZE,0,(const sockaddr*)&server_addr_to,sizeof(server_addr_to));
+        printSend(&pkt,0);
 
         // Wait for ACK
-        /*
-        char ack_pkt_buff[PKT_SIZE];
-        usleep(TIMEOUT * 10000);// wait for 0.2 seconds (RTT?) 
-        while( read(listen_sockfd, ack_pkt_buff, PKT_SIZE) < 0 )// Attempt to read an ACK 
-        {
-            sendto(send_sockfd,pkt_buffer,PKT_SIZE,0,(const sockaddr*)&server_addr_to,sizeof(server_addr_to));
-        }
-        memcpy(ack_pkt_buff,&ack_pkt,sizeof(pkt));
-        printRecv(&ack_pkt);
-        */
+        //while(true){// this is where we "stop and wait"
+            // wait rtt
+            //usleep( TIMEOUT * 100000 );// wait for 0.2 seconds (RTT?)            
+            
+            // read and store pkt
+            if ( recv(listen_sockfd, ack_pkt_buffer, PKT_SIZE,0) < PKT_SIZE ){
+                continue;
+            }
+            memcpy(&ack_pkt, ack_pkt_buffer,  sizeof(ack_pkt) );// store ack pkt buffer into pkt 
+            printRecv(&ack_pkt);
 
-        //seq_num++;
-        usleep(TIMEOUT * 100);
-        //ack_num += rec_pkt ack (cumulative?)
+            /*
+            // check ack num
+            if( ack_pkt.acknum == seq_num + 1 ){// cumulative ? next to be recieved ? last successfully recieved ? .TBD
+                break; // good, exit wait loop
+            }else{
+                //else we need to send again
+                sendto(send_sockfd,pkt_buffer,PKT_SIZE,0,(const sockaddr*)&server_addr_to,sizeof(server_addr_to));
+                printSend(&pkt,1);
+            }
+        }*/
+        //printRecv(&ack_pkt);
+        
     }
-    // send last packet
+    // send last packet ( need rdt loop )
     readFileSection(buffer,fp,seq_num,file_info.trail);// read trail bytes, put in buffer
     build_packet(&pkt, seq_num,ack_num,1,0,file_info.trail,buffer);//build pkt (use buffer)
     memcpy(pkt_buffer,&pkt,sizeof(pkt));// copy pkt into buffer
     ssize_t bytes_sent = sendto(send_sockfd,pkt_buffer,PKT_SIZE,0,(const sockaddr*)&server_addr_to,sizeof(server_addr_to));
     printSend(&pkt,0);
-    printBuffer(pkt.payload,pkt.length);
     
     fclose(fp);
     close(listen_sockfd);

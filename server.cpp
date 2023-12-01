@@ -66,24 +66,40 @@ int main() {
         return 1;
     }
 
-    // TODO: Receive file from the client and save it as output.txt
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////
+
     int total_byte = 0;
-    while(true){ // recieve until we find a pkt with last = true
-        int val_read = 0;
+    while(true){ // recieve until we read all data in
         char pkt_buff[PKT_SIZE];
         packet rec_pkt;
 
-        val_read = recv(listen_sockfd, pkt_buff, PKT_SIZE,0);
-        memcpy(&rec_pkt, pkt_buff, sizeof(packet));
+        // Recieve pkt from proxy 
+        if ( recv(listen_sockfd, pkt_buff, PKT_SIZE,0) < PKT_SIZE ){
+            continue;
+        }
+        memcpy(&rec_pkt, pkt_buff, sizeof(packet));//store in rec_pkt
         printRecv(&rec_pkt);
         // TODO, handle dup packets - track seq nums already recieved ?
 
+        // Save the pkt's payload to output.txt
         total_byte += writePkt(rec_pkt.seqnum, rec_pkt.payload, fp, rec_pkt.length);
-        printf("\tfs: %d\n",total_byte);
 
+        /* TEST ACK FOR S&G TESTING */
+                    // ackpkt  seqnum of recv'd pkt  next expected  T id recv'd is last else false                no payload 
+        char test_buf[PKT_SIZE];
+        build_packet(&ack_pkt, rec_pkt.seqnum, rec_pkt.seqnum + 1 , rec_pkt.last ? 1 : 0, 1 /*IMPORTANT 1=true*/, 0 , NULL );
+        memcpy(test_buf,&ack_pkt,PKT_SIZE);
+        sendto(send_sockfd,test_buf,PKT_SIZE,0,(const sockaddr*)&client_addr_to,sizeof(client_addr_to));
+        printSend(&ack_pkt,0);
+        /* ------------------------ */
+
+
+        // Check if done ( only S&G can end at pkt.last  )
         if(rec_pkt.last){
             break;//break when we recieve last packet (only for stop and go)
-            // later, might be when we send ack for last pkt
+            // later, might be when we send ack for last pkt ( dont care if client gets the ack, server is done (grader ends at server end ) )
+            // or maybe when total_byte = PAYLOAD_SIZE * ( rec_pkt.seqnum - 1 ) + rec_pkt.length (tail) (on to something....) 
         }
 
         // send(); // TODO send ack to send_sockfd - 5001
