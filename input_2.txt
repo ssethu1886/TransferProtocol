@@ -1,45 +1,36 @@
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac quam eu libero consectetur sodales id eu felis. Quisque nec semper elit. Integer sed dui vitae libero malesuada laoreet. Aenean tincidunt elit a elit sollicitudin, at fermentum felis condimentum. Nulla facilisi. Nunc luctus, mauris a suscipit feugiat, nisl justo congue metus, a dictum nunc purus vel nulla. Suspendisse nec massa aliquet, hendrerit lacus eu, bibendum leo. Sed sed metus vel nulla tincidunt lacinia. Nullam tincidunt elit ut purus congue, id rhoncus arcu venenatis. Quisque tincidunt efficitur justo, vel bibendum felis sollicitudin nec.
+From the very beginning, our discussion of the Maximum-Flow Problem has
+been centered around the idea of an augmenting path in the residual graph.
+However, there are some very powerful techniques for maximum flow that are
+not explicitly based on augmenting paths. In this section we study one such
+technique, the Preflow-Push Algorithm
 
-Vestibulum at lectus fermentum, dignissim urna ac, auctor purus. Vivamus vel justo et nisl dapibus luctus. Integer fermentum dolor a erat vehicula, nec bibendum sapien gravida. Nunc non sapien auctor, bibendum turpis eget, tincidunt elit. Nam volutpat, risus at tincidunt volutpat, ligula elit ullamcorper orci, nec interdum neque metus at nunc. Sed eu elit vel turpis imperdiet sollicitudin nec ac elit. Duis id vulputate tellus. Etiam eu ligula nec velit efficitur finibus a vel ligula. Ut a nisi in quam interdum mattis. Fusce nec sapien vel purus tristique consectetur.
+Algorithms based on augmenting paths maintain a flow f , and use the augment
+procedure to increase the value of the flow. By way of contrast, the Preflow-
+Push Algorithm will, in essence, increase the flow on an edge-by-edge basis.
+Changing the flow on a single edge will typically violate the conservation con-
+dition, and so the algorithm will have to maintain something less well behaved
+than a flow—something that does not obey conservation—as it operates.
 
-Curabitur lacinia eu elit nec posuere. Nulla facilisi. Fusce efficitur vel quam id euismod. Vivamus at nisi vel lacus venenatis tristique. Aenean nec metus sit amet urna luctus ullamcorper. Etiam tincidunt, dolor eget bibendum hendrerit, purus dolor bibendum dui, in tristique purus arcu a nulla. Sed vitae interdum justo. Fusce volutpat hendrerit dui, id ultrices nulla. Integer id risus et velit facilisis suscipit. Curabitur vel elit in libero dapibus interdum sit amet ut elit.
+As usual, this algorithm is somewhat underspecified. For an implementation
+of the algorithm, we will have to specify which node with excess to choose,
+and how to efficiently select an edge on which to push. However, it is clear
+that each iteration of this algorithm can be implemented in polynomial time.
+(We’ll discuss later how to implement it reasonably efficiently.) Further, it is
+not hard to see that the preflow f and the labeling h are compatible throughout
+the algorithm. If the algorithm terminates—something that is far from obvious
+based on its description—then there are no nodes other than t with positive
+excess, and hence the preflow f is in fact a flow. It then follows from (7.22)
+that f would be a maximum flow at termination
 
-Phasellus ultrices mi ut lacus ultricies, ut consequat nisi dignissim. Curabitur ac leo sit amet tellus luctus rhoncus. Sed nec augue ac tortor euismod pellentesque. Fusce et efficitur felis. Vivamus non ullamcorper nisl, eget malesuada quam. Nullam accumsan velit ac tellus consectetur, vel pharetra quam ultricies. Sed vestibulum lectus vitae mi bibendum, in aliquet nulla vulputate. Vivamus ut leo vel est fermentum fringilla. Nunc eget turpis ac sapien feugiat dictum sit amet ac urna. Nullam tincidunt, turpis nec pellentesque fermentum, velit justo vestibulum libero, id egestas sapien neque vel ligula.
-
-Integer at ligula eget eros posuere hendrerit vel et tortor. Etiam euismod sapien nec fermentum euismod. Ut tincidunt arcu vel risus gravida, in laoreet orci ultrices. Vivamus nec sodales sem. Sed volutpat erat in lorem sollicitudin facilisis. Nulla facilisi. Proin ac urna in dui tristique congue. Etiam auctor justo in turpis scelerisque, nec pellentesque elit scelerisque. Curabitur eu dolor et justo ullamcorper aliquet nec et elit.
-
-Pellentesque eleifend, mi sit amet rhoncus bibendum, elit quam bibendum elit, in consectetur quam odio at erat. Integer dapibus, nunc ac euismod hendrerit, ligula arcu tincidunt libero, vel gravida dui elit id metus. Nulla facilisi. Praesent ac accumsan libero. Nam fermentum dui ac metus efficitur, ut vestibulum felis fermentum. Integer nec quam vel tortor hendrerit consequat vel id nunc. Maecenas et lacinia est. Aenean eget metus eu lectus ullamcorper vulputate ut sit amet libero. Sed euismod, dolor id tincidunt auctor, sapien velit ullamcorper velit, vel efficitur metus tortor ut dolor. Vivamus gravida nisl vel elit pulvinar, in cursus elit bibendum. Suspendisse non ultrices lectus, at accumsan ex. Sed ut rhoncus dui, sit amet congue quam.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac quam eu libero consectetur sodales id eu felis. Quisque nec semper elit. Integer sed dui vitae libero malesuada laoreet. Aenean tincidunt elit a elit sollicitudin, at fermentum felis condimentum. Nulla facilisi. Nunc luctus, mauris a suscipit feugiat, nisl justo congue metus, a dictum nunc purus vel nulla. Suspendisse nec massa aliquet, hendrerit lacus eu, bibendum leo. Sed sed metus vel nulla tincidunt lacinia. Nullam tincidunt elit ut purus congue, id rhoncus arcu venenatis. Quisque tincidunt efficitur justo, vel bibendum felis sollicitudin nec.
-
-Vestibulum at lectus fermentum, dignissim urna ac, auctor purus. Vivamus vel justo et nisl dapibus luctus. Integer fermentum dolor a erat vehicula, nec bibendum sapien gravida. Nunc non sapien auctor, bibendum turpis eget, tincidunt elit. Nam volutpat, risus at tincidunt volutpat, ligula elit ullamcorper orci, nec interdum neque metus at nunc. Sed eu elit vel turpis imperdiet sollicitudin nec ac elit. Duis id vulputate tellus. Etiam eu ligula nec velit efficitur finibus a vel ligula. Ut a nisi in quam interdum mattis. Fusce nec sapien vel purus tristique consectetur.
-
-Curabitur lacinia eu elit nec posuere. Nulla facilisi. Fusce efficitur vel quam id euismod. Vivamus at nisi vel lacus venenatis tristique. Aenean nec metus sit amet urna luctus ullamcorper. Etiam tincidunt, dolor eget bibendum hendrerit, purus dolor bibendum dui, in tristique purus arcu a nulla. Sed vitae interdum justo. Fusce volutpat hendrerit dui, id ultrices nulla. Integer id risus et velit facilisis suscipit. Curabitur vel elit in libero dapibus interdum sit amet ut elit.
-
-Phasellus ultrices mi ut lacus ultricies, ut consequat nisi dignissim. Curabitur ac leo sit amet tellus luctus rhoncus. Sed nec augue ac tortor euismod pellentesque. Fusce et efficitur felis. Vivamus non ullamcorper nisl, eget malesuada quam. Nullam accumsan velit ac tellus consectetur, vel pharetra quam ultricies. Sed vestibulum lectus vitae mi bibendum, in aliquet nulla vulputate. Vivamus ut leo vel est fermentum fringilla. Nunc eget turpis ac sapien feugiat dictum sit amet ac urna. Nullam tincidunt, turpis nec pellentesque fermentum, velit justo vestibulum libero, id egestas sapien neque vel ligula.
-
-Integer at ligula eget eros posuere hendrerit vel et tortor. Etiam euismod sapien nec fermentum euismod. Ut tincidunt arcu vel risus gravida, in laoreet orci ultrices. Vivamus nec sodales sem. Sed volutpat erat in lorem sollicitudin facilisis. Nulla facilisi. Proin ac urna in dui tristique congue. Etiam auctor justo in turpis scelerisque, nec pellentesque elit scelerisque. Curabitur eu dolor et justo ullamcorper aliquet nec et elit.
-
-Pellentesque eleifend, mi sit amet rhoncus bibendum, elit quam bibendum elit, in consectetur quam odio at erat. Integer dapibus, nunc ac euismod hendrerit, ligula arcu tincidunt libero, vel gravida dui elit id metus. Nulla facilisi. Praesent ac accumsan libero. Nam fermentum dui ac metus efficitur, ut vestibulum felis fermentum. Integer nec quam vel tortor hendrerit consequat vel id nunc. Maecenas et lacinia est. Aenean eget metus eu lectus ullamcorper vulputate ut sit amet libero. Sed euismod, dolor id tincidunt auctor, sapien velit ullamcorper velit, vel efficitur metus tortor ut dolor. Vivamus gravida nisl vel elit pulvinar, in cursus elit bibendum. Suspendisse non ultrices lectus, at accumsan ex. Sed ut rhoncus dui, sit amet congue quam.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac quam eu libero consectetur sodales id eu felis. Quisque nec semper elit. Integer sed dui vitae libero malesuada laoreet. Aenean tincidunt elit a elit sollicitudin, at fermentum felis condimentum. Nulla facilisi. Nunc luctus, mauris a suscipit feugiat, nisl justo congue metus, a dictum nunc purus vel nulla. Suspendisse nec massa aliquet, hendrerit lacus eu, bibendum leo. Sed sed metus vel nulla tincidunt lacinia. Nullam tincidunt elit ut purus congue, id rhoncus arcu venenatis. Quisque tincidunt efficitur justo, vel bibendum felis sollicitudin nec.
-
-Vestibulum at lectus fermentum, dignissim urna ac, auctor purus. Vivamus vel justo et nisl dapibus luctus. Integer fermentum dolor a erat vehicula, nec bibendum sapien gravida. Nunc non sapien auctor, bibendum turpis eget, tincidunt elit. Nam volutpat, risus at tincidunt volutpat, ligula elit ullamcorper orci, nec interdum neque metus at nunc. Sed eu elit vel turpis imperdiet sollicitudin nec ac elit. Duis id vulputate tellus. Etiam eu ligula nec velit efficitur finibus a vel ligula. Ut a nisi in quam interdum mattis. Fusce nec sapien vel purus tristique consectetur.
-
-Curabitur lacinia eu elit nec posuere. Nulla facilisi. Fusce efficitur vel quam id euismod. Vivamus at nisi vel lacus venenatis tristique. Aenean nec metus sit amet urna luctus ullamcorper. Etiam tincidunt, dolor eget bibendum hendrerit, purus dolor bibendum dui, in tristique purus arcu a nulla. Sed vitae interdum justo. Fusce volutpat hendrerit dui, id ultrices nulla. Integer id risus et velit facilisis suscipit. Curabitur vel elit in libero dapibus interdum sit amet ut elit.
-
-Phasellus ultrices mi ut lacus ultricies, ut consequat nisi dignissim. Curabitur ac leo sit amet tellus luctus rhoncus. Sed nec augue ac tortor euismod pellentesque. Fusce et efficitur felis. Vivamus non ullamcorper nisl, eget malesuada quam. Nullam accumsan velit ac tellus consectetur, vel pharetra quam ultricies. Sed vestibulum lectus vitae mi bibendum, in aliquet nulla vulputate. Vivamus ut leo vel est fermentum fringilla. Nunc eget turpis ac sapien feugiat dictum sit amet ac urna. Nullam tincidunt, turpis nec pellentesque fermentum, velit justo vestibulum libero, id egestas sapien neque vel ligula.
-
-Integer at ligula eget eros posuere hendrerit vel et tortor. Etiam euismod sapien nec fermentum euismod. Ut tincidunt arcu vel risus gravida, in laoreet orci ultrices. Vivamus nec sodales sem. Sed volutpat erat in lorem sollicitudin facilisis. Nulla facilisi. Proin ac urna in dui tristique congue. Etiam auctor justo in turpis scelerisque, nec pellentesque elit scelerisque. Curabitur eu dolor et justo ullamcorper aliquet nec et elit.
-
-Pellentesque eleifend, mi sit amet rhoncus bibendum, elit quam bibendum elit, in consectetur quam odio at erat. Integer dapibus, nunc ac euismod hendrerit, ligula arcu tincidunt libero, vel gravida dui elit id metus. Nulla facilisi. Praesent ac accumsan libero. Nam fermentum dui ac metus efficitur, ut vestibulum felis fermentum. Integer nec quam vel tortor hendrerit consequat vel id nunc. Maecenas et lacinia est. Aenean eget metus eu lectus ullamcorper vulputate ut sit amet libero. Sed euismod, dolor id tincidunt auctor, sapien velit ullamcorper velit, vel efficitur metus tortor ut dolor. Vivamus gravida nisl vel elit pulvinar, in cursus elit bibendum. Suspendisse non ultrices lectus, at accumsan ex. Sed ut rhoncus dui, sit amet congue quam.
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ac quam eu libero consectetur sodales id eu felis. Quisque nec semper elit. Integer sed dui vitae libero malesuada laoreet. Aenean tincidunt elit a elit sollicitudin, at fermentum felis condimentum. Nulla facilisi. Nunc luctus, mauris a suscipit feugiat, nisl justo congue metus, a dictum nunc purus vel nulla. Suspendisse nec massa aliquet, hendrerit lacus eu, bibendum leo. Sed sed metus vel nulla tincidunt lacinia. Nullam tincidunt elit ut purus congue, id rhoncus arcu venenatis. Quisque tincidunt efficitur justo, vel bibendum felis sollicitudin nec.
-
-Vestibulum at lectus fermentum, dignissim urna ac, auctor purus. Vivamus vel justo et nisl dapibus luctus. Integer fermentum dolor a erat vehicula, nec bibendum sapien gravida. Nunc non sapien auctor, bibendum turpis eget, tincidunt elit. Nam volutpat, risus at tincidunt volutpat, ligula elit ullamcorper orci, nec interdum neque metus at nunc. Sed eu elit vel turpis imperdiet sollicitudin nec ac elit. Duis id vulputate tellus. Etiam eu ligula nec velit efficitur finibus a vel ligula. Ut a nisi in quam interdum mattis. Fusce nec sapien vel purus tristique consectetur.
-
-Curabitur lacinia eu elit nec posuere. Nulla facilisi. Fusce efficitur vel quam id euismod. Vivamus at nisi vel lacus venenatis tristique. Aenean nec metus sit amet urna luctus ullamcorper. Etiam tincidunt, dolor eget bibendum hendrerit, purus dolor bibendum dui, in tristique purus arcu a nulla. Sed vitae interdum justo. Fusce volutpat hendrerit dui, id ultrices nulla. Integer id risus et velit facilisis suscipit. Curabitur vel elit in libero dapibus interdum sit amet ut elit.
-
-Phasellus ultrices mi ut lacus ultricies, ut consequat nisi dignissim. Curabitur ac leo sit amet tellus luctus rhoncus. Sed nec augue ac tortor euismod pellentesque. Fusce et efficitur felis. Vivamus non ullamcorper nisl, eget malesuada quam. Nullam accumsan velit ac tellus consectetur, vel pharetra quam ultricies. Sed vestibulum lectus vitae mi bibendum, in aliquet nulla vulputate. Vivamus ut leo vel est fermentum fringilla. Nunc eget turpis ac sapien feugiat dictum sit amet ac urna. Nullam tincidunt, turpis nec pellentesque fermentum, velit justo vestibulum libero, id egestas sapien neque vel ligula.
-
-Integer at ligula eget eros posuere hendrerit vel et tortor. Etiam euismod sapien nec fermentum euismod. Ut tincidunt arcu vel risus gravida, in laoreet orci ultrices. Vivamus nec sodales sem. Sed volutpat erat in lorem sollicitudin facilisis. Nulla facilisi. Proin ac urna in dui tristique congue. Etiam auctor justo in turpis scelerisque, nec pellentesque elit scelerisque. Curabitur eu dolor et justo ullamcorper aliquet nec et elit.
+Proof. By (7.23) the initial preflow f and labeling h are compatible. We will
+show using induction on the number of push and relabel operations that
+f and h satisfy the properties of the statement. The push operation modifies
+the preflow f , but the bounds on δ guarantee that the f returned satisfies
+the capacity constraints, and that excesses all remain nonnegative, so f is a
+preflow. To see that the preflow f and the labeling h are compatible, note that
+push(f , h, v, w) can add one edge to the residual graph, the reverse edge (v, w),
+and this edge does satisfy the steepness condition. The relabel operation
+increases the label of v, and hence increases the steepness of all edges leaving
+v. However, it only applies when no edge leaving v in the residual graph is
+going downward, and hence the preflow f and the labeling h are compatible
+after relabeling

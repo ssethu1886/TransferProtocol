@@ -72,13 +72,15 @@ int main() {
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     int total_byte = 0;
-    while(true){ // recieve until we read all data in
+
+    char listen_for_file = true;
+    while(listen_for_file){ // recieve until we read all data in
         char pkt_buff[PKT_SIZE];
         packet rec_pkt;
 
         // Recieve pkt from proxy 
         if ( recv(listen_sockfd, pkt_buff, PKT_SIZE,0) < PKT_SIZE ){
-            printf("no pkt\n");
+            printf("Failed to read full packet (s)\n");
             continue;
         } 
         memcpy(&rec_pkt, pkt_buff, sizeof(packet));//store in rec_pkt
@@ -100,6 +102,8 @@ int main() {
 
         // Check if done ( only S&G can end at pkt.last  )
         if(rec_pkt.last){
+            printf("last ack");
+            listen_for_file = false;// stop listening
             break;//break when we recieve last packet (only for stop and go)
             // later, might be when we send ack for last pkt ( dont care if client gets the ack, server is done (grader ends at server end ) )
             // or maybe when total_byte = PAYLOAD_SIZE * ( rec_pkt.seqnum - 1 ) + rec_pkt.length (tail) (on to something....) 

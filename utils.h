@@ -74,7 +74,7 @@ void getFileInfo( struct file_info* file_info, FILE * fp) {
     int totalSections = (fileSize / PAYLOAD_SIZE);
 
     file_info->size = fileSize;
-    file_info->sections = totalSections;// FULL sections
+    file_info->sections = totalSections + ( remainingBytes ? 1 : 0 );// TOTAL sections
     file_info->trail = remainingBytes;
 }
 
@@ -87,7 +87,7 @@ void printBuffer(char* buffer, int size) {
 }
 
 void printFileInfo(file_info * fi){
-    printf("File Info: size = %d, sections = %d, trail = %d \n",fi->size, fi->sections, fi->trail);
+    printf("File Info: size = %d, total sections = %d, trail size = %d \n",fi->size, fi->sections, fi->trail);
 }
 
 void readFileSection(char* buffer, FILE * fp, int seq_num, int bytes){

@@ -84,6 +84,8 @@ int main(int argc, char *argv[]) {
 
     ///////////////////////////////////////////////////////////////////////////////////////////
 
+    int send_last_count = 0;// counter so client can end eventually, just for testing
+
     // stop and wait (still need timeouts)
     char pkt_buffer[PKT_SIZE];// buffer to hold pkt
     char ack_pkt_buffer[PKT_SIZE];// buffer to hold ack pkt
@@ -91,28 +93,43 @@ int main(int argc, char *argv[]) {
         
         // Read file section and store in a packet's payload
         readFileSection(buffer,fp,seq_num,PAYLOAD_SIZE);// read 1024, put in buffer
-        build_packet(&pkt, seq_num,ack_num,0,0,MAX_SEQUENCE,buffer);//build pkt (use buffer)
+        // Check if this is the last one ( length needs special care )
+        if( seq_num == file_info.sections - 1 ){ // last pkt
+            build_packet(&pkt, seq_num,ack_num,1,0,file_info.trail,buffer);//build pkt (use buffer, TRAIL length)
+        }else{
+            build_packet(&pkt, seq_num,ack_num,0,0,MAX_SEQUENCE,buffer);//build pkt (use buffer)
+        }
         memcpy(pkt_buffer,&pkt,sizeof(pkt));// copy pkt into buffer (for sending)
         // Send 
         sendto(send_sockfd,pkt_buffer,PKT_SIZE,0,(const sockaddr*)&server_addr_to,sizeof(server_addr_to));
         printSend(&pkt,0);
-
+        
         // Wait for ACK
         while(true){// this is where we "stop and wait" (while loop just lets us save reading time - might be too complicated later) 
             // wait rtt
-            usleep( TIMEOUT * 100000 );// wait for 0.2 seconds (RTT?)            
+            usleep( TIMEOUT * 1/*00000*/ );// Wait timeout amt of time
             
-            // read and store pkt
-            if ( recv(listen_sockfd, ack_pkt_buffer, PKT_SIZE,0) < PKT_SIZE ){
-                sendto(send_sockfd,pkt_buffer,PKT_SIZE,0,(const sockaddr*)&server_addr_to,sizeof(server_addr_to));
-                printSend(&pkt,1);
-                printf("waiting for ack\n");
-                continue;
+            if(send_last_count > 100 ){
+                printf("exit early (c)\n");
+                break;// for debugging only, wont matter in autograder
             }
-            
+
+            // Check if we recieved a acks or timed out
+            if ( recv(listen_sockfd, ack_pkt_buffer, PKT_SIZE,0) < PKT_SIZE ){
+                // If we havent recieved ack after waiting for timeout, then resend, repeat for every timeout w no acks 
+                sendto(send_sockfd,pkt_buffer,PKT_SIZE,0,(const sockaddr*)&server_addr_to,sizeof(server_addr_to));
+                printSend(&pkt,1);// Resend
+
+                if(pkt.last){
+                    send_last_count++;
+                }
+
+                continue;// ie. wait for next timeout to try again
+            }
+
+            // Save ack pkt
             memcpy(&ack_pkt, ack_pkt_buffer,  sizeof(ack_pkt) );// store ack pkt buffer into pkt 
             printRecv(&ack_pkt);
-
             
             // check ack num
             if( ack_pkt.acknum == seq_num + 1 ){// cumulative ? next to be recieved ? last successfully recieved ? .TBD
@@ -123,16 +140,7 @@ int main(int argc, char *argv[]) {
                 printSend(&pkt,1);
             }
         }
-        //printRecv(&ack_pkt);
-        
-    }
-    // send last packet ( need rdt loop )
-    readFileSection(buffer,fp,seq_num,file_info.trail);// read trail bytes, put in buffer
-    build_packet(&pkt, seq_num,ack_num,1,0,file_info.trail,buffer);//build pkt (use buffer)
-    memcpy(pkt_buffer,&pkt,sizeof(pkt));// copy pkt into buffer
-    ssize_t bytes_sent = sendto(send_sockfd,pkt_buffer,PKT_SIZE,0,(const sockaddr*)&server_addr_to,sizeof(server_addr_to));
-    printSend(&pkt,0);
-    
+    }    
     fclose(fp);
     close(listen_sockfd);
     close(send_sockfd);
