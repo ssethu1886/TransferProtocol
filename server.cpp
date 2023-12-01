@@ -78,8 +78,7 @@ int main() {
         printRecv(&rec_pkt);
         // TODO, handle dup packets - track seq nums already recieved ?
 
-        int byte_write = fwrite(rec_pkt.payload, 1, rec_pkt.length, fp);
-        total_byte += byte_write;
+        total_byte += writePkt(rec_pkt.seqnum, rec_pkt.payload, fp, rec_pkt.length);
         printf("\tfs: %d\n",total_byte);
 
         if(rec_pkt.last){
