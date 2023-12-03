@@ -103,4 +103,17 @@ void readFileSection(char* buffer, FILE * fp, int seq_num, int bytes){
     }
 }
 
+void writeFileSection(char* buffer, FILE * fp, int seq_num, int bytes){
+    int offset = seq_num * PAYLOAD_SIZE;
+    if (fseek(fp, offset, SEEK_SET) != 0) {
+        fprintf(stderr, "Error seeking to the desired section\n");
+        return;
+    }
+    size_t bytesWritten = fwrite(buffer, 1, bytes, fp);
+    if (bytesWritten != bytes) {
+        fprintf(stderr, "Error writing the file section\n");
+        return;
+    }
+}
+
 #endif

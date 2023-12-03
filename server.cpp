@@ -66,20 +66,41 @@ int main() {
         return 1;
     }
 
+    // set timeout length
+    struct timeval timeout;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 100000;
+
     // TODO: Receive file from the client and save it as output.txt
     while(true){ // recieve until we find a pkt with last = true
         int val_read = 0;
         char pkt_buff[PKT_SIZE];
         packet rec_pkt;
 
+        // set timeout for sending ack
+        int j = setsockopt(send_sockfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+
         val_read = recv(listen_sockfd, pkt_buff, PKT_SIZE,0);
-        printf("read: %d bytes\n",val_read);
-        //printBuffer(pkt_buff,PKT_SIZE);//note: this is also printing the packet (~12 bytes)      
+       
         memcpy(&rec_pkt, pkt_buff, sizeof(packet));
         printRecv(&rec_pkt);
+
+        // write payload to output file
+	if (rec_pkt.last) {
+         writeFileSection(pkt_buff,fp,rec_pkt.seqnum,331);
+	} else {
+         writeFileSection(pkt_buff,fp,rec_pkt.seqnum,PAYLOAD_SIZE);
+        }
+        packet ack_pkt;
+        build_packet(&ack_pkt, 0, rec_pkt.seqnum, 0, 1, 0, NULL); //build ack pkt
+        sendto(send_sockfd, &ack_pkt, sizeof(ack_pkt), 0, (const sockaddr*)&client_addr_to, sizeof(client_addr_to));
+        printSend(&ack_pkt,0);
         
-        // TODO save payload to outpu file
-        // send(); // TODO send ack to send_sockfd - 5001
+        if(rec_pkt.last){
+            printf("last\n");
+            break;
+        }  //break if last packet
+        
     }
     fclose(fp);
     close(listen_sockfd);

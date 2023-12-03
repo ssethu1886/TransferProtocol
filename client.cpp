@@ -7,6 +7,7 @@
 
 #include "utils.h"
 
+//test
 
 int main(int argc, char *argv[]) {
     int listen_sockfd, send_sockfd;
@@ -81,37 +82,49 @@ int main(int argc, char *argv[]) {
         printFileInfo(&file_info);
     }
 
+// set timeout length
+struct timeval timeout;
+timeout.tv_sec = 0;
+timeout.tv_usec = 100000;
+
+
     // stop and wait
-    for( int i = 0; i < file_info.sections; i++){
+    //for( int i = 0; i < file_info.sections; i++){
+    for( int i = 0; seq_num <= file_info.sections; i++){
         // Read file section and send it in a packet
         readFileSection(buffer,fp,seq_num,PAYLOAD_SIZE);// read 1024, put in buffer
+        if (seq_num == file_info.sections) { // set flag for last packet
+           build_packet(&pkt, seq_num,ack_num,1,0,file_info.trail,buffer);//build pkt (use buffer)
+	} else {
         build_packet(&pkt, seq_num,ack_num,0,0,MAX_SEQUENCE,buffer);//build pkt (use buffer)
-
+    }
         char pkt_buffer[PKT_SIZE];// buffer to hold pkt
         memcpy(pkt_buffer,&pkt,sizeof(pkt));// copy pkt into buffer
         //printBuffer(pkt_buffer,PKT_SIZE);// test
 
+        // set timeout for recv acks
+        int j = setsockopt(listen_sockfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+
         ssize_t bytes_sent = sendto(send_sockfd,pkt_buffer,PKT_SIZE,0,
             (const sockaddr*)&server_addr_to,sizeof(server_addr_to));
-        //printf("Bytes sent: %zd\n", bytes_sent);// db
         printSend(&pkt,0);
-
-        //packet recieved_pkt
-        //usleep(TIMEOUT * 100000);// wait for 0.2 seconds (prop/RTT) = 200 000 microseconds
-        //int val_read = read(listen_fd, recieved_pkt, sizeof(recieved_pkt));// ???
-        //printRecv(recieved_pkt);
         
-        seq_num++;
-        usleep(1000);
-        //ack_num += rec_pkt ack (cumulative?)
+        packet ack_pkt;
+        char ack_buffer[PKT_SIZE];// buffer to hold ack pkt
+        recv(listen_sockfd, ack_buffer, PKT_SIZE, 0);
+        memcpy(&ack_pkt,ack_buffer,sizeof(pkt));// copy buffer into ack pkt
+       
+        if (ack_pkt.acknum == seq_num) {
+            // ack received for current packet
+            printRecv(&ack_pkt);
+            seq_num++;
+        } else {
+            printf("packet not received");
+        }
     }
-    // send last should be sent specially (?)
 
     fclose(fp);
     close(listen_sockfd);
     close(send_sockfd);
     return 0;
 }
-
-    
-
