@@ -69,16 +69,17 @@ int main() {
     // set timeout length
     struct timeval timeout;
     timeout.tv_sec = 0;
-    timeout.tv_usec = 100000;
+    timeout.tv_usec = 200000;
 
     // TODO: Receive file from the client and save it as output.txt
+    int total_byte = 0;
     while(true){ // recieve until we find a pkt with last = true
         int val_read = 0;
         char pkt_buff[PKT_SIZE];
         packet rec_pkt;
 
         // set timeout for sending ack
-        int j = setsockopt(send_sockfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+    //int j = setsockopt(send_sockfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
 
         val_read = recv(listen_sockfd, pkt_buff, PKT_SIZE,0);
        
@@ -86,11 +87,12 @@ int main() {
         printRecv(&rec_pkt);
 
         // write payload to output file
-	if (rec_pkt.last) {
-         writeFileSection(pkt_buff,fp,rec_pkt.seqnum,331);
-	} else {
-         writeFileSection(pkt_buff,fp,rec_pkt.seqnum,PAYLOAD_SIZE);
-        }
+        total_byte += writePkt(rec_pkt.seqnum, rec_pkt.payload, fp, rec_pkt.length);
+	//if (rec_pkt.last) {
+    //     writeFileSection(pkt_buff,fp,rec_pkt.seqnum,rec_pkt.length);
+	//} else {
+    //     writeFileSection(pkt_buff,fp,rec_pkt.seqnum,PAYLOAD_SIZE);
+        //}
         packet ack_pkt;
         build_packet(&ack_pkt, 0, rec_pkt.seqnum, 0, 1, 0, NULL); //build ack pkt
         sendto(send_sockfd, &ack_pkt, sizeof(ack_pkt), 0, (const sockaddr*)&client_addr_to, sizeof(client_addr_to));

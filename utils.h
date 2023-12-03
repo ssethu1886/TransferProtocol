@@ -116,4 +116,22 @@ void writeFileSection(char* buffer, FILE * fp, int seq_num, int bytes){
     }
 }
 
+int writePkt( int seq_num, char * payload_ptr, FILE * fp, unsigned int pkt_length){
+    // Want to write to a specific block of data in output.txt
+    // 1. move fp to the beginning of the block 
+    fseek(fp, seq_num * PAYLOAD_SIZE, SEEK_SET);
+    // 2. write the payload
+    int byte_write = fwrite( payload_ptr, sizeof(char), pkt_length, fp);
+    // 3. check we wrote correct amt
+    if ( byte_write < pkt_length ){
+        printf("ERROR: did not write correct amt to output.txt");
+        return 0;
+    }
+    else {
+        return byte_write;
+    }
+    // dont care here fp is bc we always move to where we need before we write
+}
+
+
 #endif

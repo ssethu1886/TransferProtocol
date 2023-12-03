@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
 // set timeout length
 struct timeval timeout;
 timeout.tv_sec = 0;
-timeout.tv_usec = 100000;
+timeout.tv_usec = 200000;
 
 
     // stop and wait
@@ -128,3 +128,6 @@ timeout.tv_usec = 100000;
     close(send_sockfd);
     return 0;
 }
+
+    
+
