@@ -79,12 +79,12 @@ int main() {
         packet rec_pkt;
 
         // set timeout for sending ack
-    //int j = setsockopt(send_sockfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
+        int j = setsockopt(send_sockfd, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
 
         val_read = recv(listen_sockfd, pkt_buff, PKT_SIZE,0);
        
         memcpy(&rec_pkt, pkt_buff, sizeof(packet));
-        printRecv(&rec_pkt);
+  //      printRecv(&rec_pkt);
 
         // write payload to output file
         total_byte += writePkt(rec_pkt.seqnum, rec_pkt.payload, fp, rec_pkt.length);
@@ -96,7 +96,7 @@ int main() {
         packet ack_pkt;
         build_packet(&ack_pkt, 0, rec_pkt.seqnum, 0, 1, 0, NULL); //build ack pkt
         sendto(send_sockfd, &ack_pkt, sizeof(ack_pkt), 0, (const sockaddr*)&client_addr_to, sizeof(client_addr_to));
-        printSend(&ack_pkt,0);
+//      printSend(&ack_pkt,0);
         
         if(rec_pkt.last){
             printf("last\n");

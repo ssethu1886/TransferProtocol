@@ -87,15 +87,16 @@ struct timeval timeout;
 timeout.tv_sec = 0;
 timeout.tv_usec = 200000;
 
-
+int lst_run=0;
     // stop and wait
     //for( int i = 0; i < file_info.sections; i++){
     for( int i = 0; seq_num <= file_info.sections; i++){
         // Read file section and send it in a packet
-        readFileSection(buffer,fp,seq_num,PAYLOAD_SIZE);// read 1024, put in buffer
         if (seq_num == file_info.sections) { // set flag for last packet
+         readFileSection(buffer,fp,seq_num,file_info.trail);// read 1024, put in buffer
            build_packet(&pkt, seq_num,ack_num,1,0,file_info.trail,buffer);//build pkt (use buffer)
 	} else {
+        readFileSection(buffer,fp,seq_num,PAYLOAD_SIZE);// read 1024, put in buffer
         build_packet(&pkt, seq_num,ack_num,0,0,MAX_SEQUENCE,buffer);//build pkt (use buffer)
     }
         char pkt_buffer[PKT_SIZE];// buffer to hold pkt
@@ -107,7 +108,7 @@ timeout.tv_usec = 200000;
 
         ssize_t bytes_sent = sendto(send_sockfd,pkt_buffer,PKT_SIZE,0,
             (const sockaddr*)&server_addr_to,sizeof(server_addr_to));
-        printSend(&pkt,0);
+        //printSend(&pkt,0);
         
         packet ack_pkt;
         char ack_buffer[PKT_SIZE];// buffer to hold ack pkt
@@ -116,10 +117,12 @@ timeout.tv_usec = 200000;
        
         if (ack_pkt.acknum == seq_num) {
             // ack received for current packet
-            printRecv(&ack_pkt);
+         //   printRecv(&ack_pkt);
             seq_num++;
         } else {
-            printf("packet not received");
+//            printf("packet not received");
+	    if (seq_num ==  file_info.sections) lst_run++ ;
+	    if (lst_run > 100) break;
         }
     }
 
@@ -130,4 +133,3 @@ timeout.tv_usec = 200000;
 }
 
     
-
